@@ -1,0 +1,24 @@
+name: Daily News Brief
+on:
+  schedule:
+    - cron: '0 12 * * *' # This is 8:00 AM EST (12:00 UTC)
+  workflow_dispatch: # This allows you to click a button to send a TEST email
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4 lxml
+      - name: Run Scraper
+        env:
+          SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
+          RECEIVER_EMAIL: ${{ secrets.RECEIVER_EMAIL }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+        run: python news_bot.py
