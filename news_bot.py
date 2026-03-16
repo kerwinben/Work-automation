@@ -19,7 +19,7 @@ def generate_dashboard():
     ]
     
     output = []
-    output.append("<html><head><title>ELTA Strategic Hub</title>")
+    output.append("<html><head><title>Strategic Hub</title>")
     output.append("<style>body { font-family: 'Segoe UI', sans-serif; margin: 40px; background: #f0f2f5; }")
     output.append(".container { max-width: 950px; margin: auto; background: white; padding: 30px; border-radius: 12px; }")
     output.append(".sam-box { background: #e3f2fd; padding: 20px; border-radius: 8px; border-left: 6px solid #1565c0; margin-bottom: 30px; }")
