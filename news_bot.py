@@ -13,11 +13,11 @@ def generate_dashboard():
 
     # 2. SECTOR & COMPETITOR DATA
     verticals = [
-        "AESA radar", "passive radar", "radar technology trends",
-        "Counter-UAS c-UAS systems", "SIGINT Electronic Warfare market",
+        "AESA", "passive radar", "radar technology trends", "Passive Radar Defense Applications",
+        "Counter-UAS c-UAS systems", "SIGINT",  "Electronic Warfare",
         "Israeli Defense Tech", "ELTA Systems IAI"
     ]
-    competitors = ["Hensoldt", "Northrop Grumman", "L3Harris", "Lockheed Martin Radar"]
+    competitors = ["Hensoldt", "Northrop Grumman", "L3Harris", "Lockheed Martin Radar", "Selentium Defense", "Hidden Level"]
     
     # 3. STOCK TICKERS (Visual placeholders for now)
     stocks = {"LMT": "Lockheed", "NOC": "Northrop", "LHX": "L3Harris", "ESLT": "Elbit"}
