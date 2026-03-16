@@ -1,60 +1,91 @@
 import requests
 from bs4 import BeautifulSoup
 import urllib.parse
-from datetime import datetime, timedelta  # <--- Added this
+from datetime import datetime, timedelta
+import email.utils
 
 def generate_dashboard():
-    # Get current date and time
-    # Subtract 4 hours from UTC to get Eastern Daylight Time (EDT)
-    now_utc = datetime.utcnow()
-    now_edt = now_utc - timedelta(hours=4)
-    now = now_edt.strftime("%B %d, %Y | %I:%M %p")
-    
+    # 1. TIME SETUP
+    now_utc = datetime.now(timedelta(0))
+    time_threshold = now_utc - timedelta(hours=24)
+    display_now = (now_utc - timedelta(hours=4)).strftime("%B %d, %Y | %I:%M %p")
+
+    # 2. SECTOR & COMPETITOR DATA
     verticals = [
-        "AESA", 
-        "passive radar",
-        "radar technology trends",
-        "Passive radar defense applications",
-        "Counter-UAS (c-UAS) systems",
-        "SIGINT and Electronic Warfare market",
-        "Israeli Defense Tech"
+        "AESA radar", "passive radar", "radar technology trends",
+        "Counter-UAS c-UAS systems", "SIGINT Electronic Warfare market",
+        "Israeli Defense Tech", "ELTA Systems IAI news"
     ]
+    competitors = ["Hensoldt", "Northrop Grumman", "L3Harris", "Lockheed Martin Radar", "Selentium Defense", "Hidden Level", "Elbit"]
     
+    # 3. STOCK DATA (Static Tickers for 2026)
+    stocks = {"LMT": "Lockheed", "NOC": "Northrop", "LHX": "L3Harris", "ESLT": "Elbit"}
+
+    # 4. INTELLIGENCE GLOSSARY
+    glossary = {
+        "PEO IEW&S": "Program Executive Office Intelligence, Electronic Warfare and Sensors.",
+        "AESA": "Active Electronically Scanned Array - high-bandwidth, multi-target radar.",
+        "COMINT": "Communications Intelligence - intercepting foreign communications.",
+        "MASINT": "Measurement and Signature Intelligence - distinct technical data (heat, sound).",
+        "c-UAS": "Counter-Unmanned Aircraft Systems - detection and neutralization of drones."
+    }
+    import random
+    acronym, definition = random.choice(list(glossary.items()))
+
+    # 5. HTML GENERATION
     html_content = f"""
     <html>
     <head>
-        <title>Defense Intelligence Dashboard</title>
+        <title>Director's Intel Hub</title>
         <style>
-            body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 40px; background: #f4f4f9; }}
-            .container {{ max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
-            h1 {{ color: #1a2a6c; border-bottom: 2px solid #0056b3; padding-bottom: 10px; margin-bottom: 5px; }}
-            .timestamp {{ color: #666; font-size: 0.9em; margin-bottom: 20px; }}
-            h3 {{ color: #0056b3; margin-top: 25px; text-transform: uppercase; font-size: 1.1em; }}
-            ul {{ list-style: none; padding: 0; }}
-            li {{ margin-bottom: 12px; padding: 12px; border-left: 4px solid #0056b3; background: #fafafa; border-radius: 0 4px 4px 0; }}
-            a {{ text-decoration: none; color: #333; font-weight: bold; line-height: 1.4; display: block; }}
-            a:hover {{ color: #0056b3; }}
+            body {{ font-family: 'Segoe UI', sans-serif; margin: 0; background: #eceff1; color: #333; }}
+            .sidebar {{ width: 250px; position: fixed; height: 100%; background: #1a237e; color: white; padding: 20px; }}
+            .main {{ margin-left: 290px; padding: 40px; max-width: 900px; }}
+            .card {{ background: white; padding: 20px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }}
+            h1 {{ color: #1a237e; border-bottom: 3px solid #1a237e; padding-bottom: 10px; }}
+            h3 {{ color: #d32f2f; border-left: 5px solid #d32f2f; padding-left: 10px; margin-top: 30px; }}
+            .stock-box {{ background: #263238; color: #81c784; padding: 10px; border-radius: 4px; margin-bottom: 10px; font-family: monospace; }}
+            .acronym {{ background: #fff9c4; padding: 15px; border-radius: 8px; border: 1px solid #fbc02d; }}
+            li {{ margin-bottom: 10px; }}
+            a {{ text-decoration: none; color: #0277bd; font-weight: 600; }}
+            .date {{ font-size: 0.8em; color: #777; }}
         </style>
     </head>
     <body>
-        <div class="container">
-            <h1>Intelligence Brief: Radars, c-UAS & SIGINT</h1>
-            <div class="timestamp">Last Updated: {now} (Eastern Time)</div>
+        <div class="sidebar">
+            <h2>Market Watch</h2>
+            <p>Defense Tickers:</p>
+            {"".join([f'<div class="stock-box">{t}: TRACKING...</div>' for t in stocks.keys()])}
+            <hr>
+            <div class="acronym">
+                <strong>Intel Term: {acronym}</strong><br>
+                <small>{definition}</small>
+            </div>
+        </div>
+        <div class="main">
+            <h1>Director's Intelligence Hub</h1>
+            <p><strong>Last Updated:</strong> {display_now} EDT (Last 24h Filter Active)</p>
     """
 
-    for topic in verticals:
-        encoded_topic = urllib.parse.quote(topic)
-        rss_url = f"https://news.google.com/rss/search?q={encoded_topic}&hl=en-US&gl=US&ceid=US:en"
-        response = requests.get(rss_url)
-        soup = BeautifulSoup(response.content, features="xml")
+    # 6. FETCH NEWS FOR VERTICALS AND COMPETITORS
+    for topic in (verticals + competitors):
+        query = urllib.parse.quote(f'"{topic}" when:1d')
+        rss_url = f"https://news.google.com/rss/search?q={query}&hl=en-US&gl=US&ceid=US:en"
         
-        html_content += f"<h3>{topic}</h3><ul>"
-        items = soup.find_all('item')
-        if not items:
-            html_content += "<li>No new updates for this category today.</li>"
-        for item in items[:5]:
-            html_content += f"<li><a href='{item.link.text}' target='_blank'>{item.title.text}</a></li>"
-        html_content += "</ul>"
+        try:
+            response = requests.get(rss_url, timeout=10)
+            soup = BeautifulSoup(response.content, features="xml")
+            
+            html_content += f"<h3>{topic.upper()}</h3><ul>"
+            items = soup.find_all('item')[:4]
+            
+            if not items:
+                html_content += "<li>No news in the last 24 hours.</li>"
+            for item in items:
+                html_content += f"<li><a href='{item.link.text}' target='_blank'>{item.title.text}</a><br><span class='date'>{item.pubDate.text}</span></li>"
+            html_content += "</ul>"
+        except:
+            continue
 
     html_content += "</div></body></html>"
     
