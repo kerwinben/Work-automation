@@ -34,8 +34,14 @@ def generate_dashboard():
     output.append("<div class='sam-box'><h2>🎯 Active Gov Opportunities (SAM.gov)</h2><ul>")
     
     # SAM.gov Search for Defense Electronics / Radars
-    sam_query = "radar OR SIGINT OR AESA OR PCL"
-    sam_url = f"https://sam.gov/api/prod/opportunities/v1/search?index=opp&q={sam_query}&sort=-modifiedDate&mode=search&is_active=true"
+    # Refined for High-Value Leads
+    sam_url = (
+        "https://api.sam.gov/prod/opportunities/v2/search?"
+        "q=(radar OR SIGINT OR AESA OR PCL)&" # The OR logic
+        "ncode=334511&"              # Your specific industry code
+        "sort=-modifiedDate&"
+        "limit=10"
+    )
     
     headers = {"User-Agent": "Mozilla/5.0"}
     try:
