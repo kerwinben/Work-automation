@@ -1,15 +1,20 @@
-name: Daily News Brief
+name: Deploy Intelligence Dashboard
 on:
   schedule:
-    - cron: '0 12 * * *' # This is 8:00 AM EST (12:00 UTC)
-  workflow_dispatch: # This allows you to click a button to send a TEST email
+    - cron: '0 12 * * *' # 8:00 AM EST
+  workflow_dispatch: # Manual run button
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -17,8 +22,22 @@ jobs:
       - name: Install dependencies
         run: pip install requests beautifulsoup4 lxml
       - name: Run Scraper
-        env:
-          SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
-          RECEIVER_EMAIL: ${{ secrets.RECEIVER_EMAIL }}
-          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
         run: python news_bot.py
+      - name: Upload static files
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "." # Upload the folder containing index.html
+
+  deploy:
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
