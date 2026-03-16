@@ -14,7 +14,8 @@ def generate_dashboard():
         "radar technology trends",
         "passive coherent location",
         "Counter-UAS (c-UAS) systems",
-        "SIGINT and Electronic Warfare market",
+        "SIGINT", 
+        "Electronic Warfare",
         "Israeli Defense Tech"
     ]
     
