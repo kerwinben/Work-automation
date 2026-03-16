@@ -1,7 +1,7 @@
 name: Deploy Intelligence Dashboard
 on:
   schedule:
-    - cron: '17 12 * * *' # Runs at 8:17 AM EDT (12:17 UTC)
+    - cron: '17 12 * * *' # Updated to 8:17 AM EDT to avoid "top of the hour" traffic
   workflow_dispatch: 
 
 permissions:
@@ -14,21 +14,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6 
-
+        uses: actions/checkout@v6 # <--- Updated from v4
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v6 # <--- Updated from v4
         with:
           python-version: '3.12'
-
       - name: Install dependencies
         run: pip install requests beautifulsoup4 lxml
-
       - name: Run Scraper
         run: python news_bot.py
-
       - name: Upload static files
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v4 # <--- Updated from v3
         with:
           path: "." 
 
@@ -44,4 +40,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v4 # Already v4, but good to verify
