@@ -1,8 +1,11 @@
 import requests
 from bs4 import BeautifulSoup
 import urllib.parse
+from datetime import datetime
 
 def generate_dashboard():
+    now = datetime.now().strftime("%B %d, %Y | %I:%M %p") # e.g., March 16, 2026 | 02:20 PM
+    
     verticals = [
         "AESA", 
         "passive radar",
@@ -14,7 +17,7 @@ def generate_dashboard():
     ]
     
     # Start of the HTML file with some basic styling
-    html_content = """
+    html_content = f"""
     <html>
     <head>
         <title>Defense Intelligence Dashboard</title>
@@ -32,7 +35,7 @@ def generate_dashboard():
     <body>
         <div class="container">
             <h1>Intelligence Brief: Radars, c-UAS & SIGINT</h1>
-            <p><i>Updated: 2026-03-16</i></p>
+            <div class="timestamp">Last Updated: {now} (Eastern Time)</div>
     """
 
     for topic in verticals:
