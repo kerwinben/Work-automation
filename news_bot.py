@@ -37,7 +37,7 @@ def generate_dashboard():
     # Refined for High-Value Leads
     # Use "OR" in capital letters between keywords
     sam_query = "radar OR SIGINT OR AESA OR PCL"
-    sam_url = f"https://api.sam.gov/prod/opportunities/v2/search?q={sam_query}&sort=-modifiedDate&is_active=true"
+    sam_url = f"https://sam.gov/api/prod/opportunities/v1/search?index=opp&q={sam_query}&sort=-modifiedDate&mode=search&is_active=true"
     
     headers = {"User-Agent": "Mozilla/5.0"}
     try:
