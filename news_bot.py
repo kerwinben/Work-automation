@@ -1,11 +1,14 @@
 import requests
 from bs4 import BeautifulSoup
 import urllib.parse
-from datetime import datetime  # <--- Added this
+from datetime import datetime, timedelta  # <--- Added this
 
 def generate_dashboard():
     # Get current date and time
-    now = datetime.now().strftime("%B %d, %Y | %I:%M %p") # e.g., March 16, 2026 | 02:20 PM
+    # Subtract 4 hours from UTC to get Eastern Daylight Time (EDT)
+    now_utc = datetime.utcnow()
+    now_edt = now_utc - timedelta(hours=4)
+    now = now_edt.strftime("%B %d, %Y | %I:%M %p")
     
     verticals = [
         "AESA", 
