@@ -14,7 +14,7 @@ def generate_dashboard():
         "AESA",
         "passive radar",
         "radar technology trends",
-        "Passive radar defense applications",
+        "passive coherent location",
         "Counter-UAS (c-UAS) systems",
         "SIGINT and Electronic Warfare market",
         "Israeli Defense Tech"
