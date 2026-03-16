@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import urllib.parse
 from datetime import datetime, timedelta
 import email.utils
+import random
 
 def generate_dashboard():
     # 1. TIME SETUP
@@ -14,11 +15,11 @@ def generate_dashboard():
     verticals = [
         "AESA radar", "passive radar", "radar technology trends",
         "Counter-UAS c-UAS systems", "SIGINT Electronic Warfare market",
-        "Israeli Defense Tech", "ELTA Systems IAI news"
+        "Israeli Defense Tech", "ELTA Systems IAI"
     ]
-    competitors = ["Hensoldt", "Northrop Grumman", "L3Harris", "Lockheed Martin Radar", "Selentium Defense", "Hidden Level", "Elbit"]
+    competitors = ["Hensoldt", "Northrop Grumman", "L3Harris", "Lockheed Martin Radar"]
     
-    # 3. STOCK DATA (Static Tickers for 2026)
+    # 3. STOCK TICKERS (Visual placeholders for now)
     stocks = {"LMT": "Lockheed", "NOC": "Northrop", "LHX": "L3Harris", "ESLT": "Elbit"}
 
     # 4. INTELLIGENCE GLOSSARY
@@ -29,10 +30,9 @@ def generate_dashboard():
         "MASINT": "Measurement and Signature Intelligence - distinct technical data (heat, sound).",
         "c-UAS": "Counter-Unmanned Aircraft Systems - detection and neutralization of drones."
     }
-    import random
     acronym, definition = random.choice(list(glossary.items()))
 
-    # 5. HTML GENERATION
+    # 5. HTML START
     html_content = f"""
     <html>
     <head>
@@ -44,8 +44,8 @@ def generate_dashboard():
             .card {{ background: white; padding: 20px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }}
             h1 {{ color: #1a237e; border-bottom: 3px solid #1a237e; padding-bottom: 10px; }}
             h3 {{ color: #d32f2f; border-left: 5px solid #d32f2f; padding-left: 10px; margin-top: 30px; }}
-            .stock-box {{ background: #263238; color: #81c784; padding: 10px; border-radius: 4px; margin-bottom: 10px; font-family: monospace; }}
-            .acronym {{ background: #fff9c4; padding: 15px; border-radius: 8px; border: 1px solid #fbc02d; }}
+            .stock-box {{ background: #263238; color: #81c784; padding: 10px; border-radius: 4px; margin-bottom: 10px; font-family: monospace; font-size: 0.8em; }}
+            .acronym {{ background: #fff9c4; padding: 15px; border-radius: 8px; border: 1px solid #fbc02d; color: #333; }}
             li {{ margin-bottom: 10px; }}
             a {{ text-decoration: none; color: #0277bd; font-weight: 600; }}
             .date {{ font-size: 0.8em; color: #777; }}
@@ -54,8 +54,7 @@ def generate_dashboard():
     <body>
         <div class="sidebar">
             <h2>Market Watch</h2>
-            <p>Defense Tickers:</p>
-            {"".join([f'<div class="stock-box">{t}: TRACKING...</div>' for t in stocks.keys()])}
+            {"".join([f'<div class="stock-box">{t}: MONITORING</div>' for t in stocks.keys()])}
             <hr>
             <div class="acronym">
                 <strong>Intel Term: {acronym}</strong><br>
@@ -63,28 +62,39 @@ def generate_dashboard():
             </div>
         </div>
         <div class="main">
-            <h1>Director's Intelligence Hub</h1>
-            <p><strong>Last Updated:</strong> {display_now} EDT (Last 24h Filter Active)</p>
+            <div class="card">
+                <h1>Director's Intelligence Hub</h1>
+                <p><strong>Last Updated:</strong> {display_now} EDT</p>
+                <p><i>Real-time monitoring of AESA, SIGINT, and Israeli Defense Tech.</i></p>
+            </div>
     """
 
-    # 6. FETCH NEWS FOR VERTICALS AND COMPETITORS
+    # 6. FETCH NEWS
     for topic in (verticals + competitors):
         query = urllib.parse.quote(f'"{topic}" when:1d')
         rss_url = f"https://news.google.com/rss/search?q={query}&hl=en-US&gl=US&ceid=US:en"
         
         try:
+            # Added a 10 second timeout and error checking
             response = requests.get(rss_url, timeout=10)
-            soup = BeautifulSoup(response.content, features="xml")
+            response.raise_for_status() 
+            
+            # Using 'html.parser' instead of 'xml' to reduce dependency errors
+            soup = BeautifulSoup(response.content, "html.parser")
             
             html_content += f"<h3>{topic.upper()}</h3><ul>"
-            items = soup.find_all('item')[:4]
+            items = soup.find_all('item')[:3]
             
             if not items:
-                html_content += "<li>No news in the last 24 hours.</li>"
-            for item in items:
-                html_content += f"<li><a href='{item.link.text}' target='_blank'>{item.title.text}</a><br><span class='date'>{item.pubDate.text}</span></li>"
+                html_content += "<li>No new updates in the last 24 hours.</li>"
+            else:
+                for item in items:
+                    title = item.title.text if item.title else "No Title"
+                    link = item.link.text if item.link else "#"
+                    html_content += f"<li><a href='{link}' target='_blank'>{title}</a></li>"
             html_content += "</ul>"
-        except:
+        except Exception as e:
+            print(f"Skipping {topic} due to error: {e}")
             continue
 
     html_content += "</div></body></html>"
