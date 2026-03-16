@@ -1,9 +1,10 @@
 import requests
 from bs4 import BeautifulSoup
 import urllib.parse
-from datetime import datetime
+from datetime import datetime  # <--- Added this
 
 def generate_dashboard():
+    # Get current date and time
     now = datetime.now().strftime("%B %d, %Y | %I:%M %p") # e.g., March 16, 2026 | 02:20 PM
     
     verticals = [
@@ -16,20 +17,20 @@ def generate_dashboard():
         "Israeli Defense Tech"
     ]
     
-    # Start of the HTML file with some basic styling
     html_content = f"""
     <html>
     <head>
         <title>Defense Intelligence Dashboard</title>
         <style>
-            body { font-family: sans-serif; margin: 40px; background: #f4f4f9; }
-            .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-            h1 { color: #333; border-bottom: 2px solid #0056b3; padding-bottom: 10px; }
-            h3 { color: #0056b3; margin-top: 25px; }
-            ul { list-style: none; padding: 0; }
-            li { margin-bottom: 10px; padding: 10px; border-left: 4px solid #0056b3; background: #fafafa; }
-            a { text-decoration: none; color: #333; font-weight: bold; }
-            a:hover { color: #0056b3; }
+            body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 40px; background: #f4f4f9; }}
+            .container {{ max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
+            h1 {{ color: #1a2a6c; border-bottom: 2px solid #0056b3; padding-bottom: 10px; margin-bottom: 5px; }}
+            .timestamp {{ color: #666; font-size: 0.9em; margin-bottom: 20px; }}
+            h3 {{ color: #0056b3; margin-top: 25px; text-transform: uppercase; font-size: 1.1em; }}
+            ul {{ list-style: none; padding: 0; }}
+            li {{ margin-bottom: 12px; padding: 12px; border-left: 4px solid #0056b3; background: #fafafa; border-radius: 0 4px 4px 0; }}
+            a {{ text-decoration: none; color: #333; font-weight: bold; line-height: 1.4; display: block; }}
+            a:hover {{ color: #0056b3; }}
         </style>
     </head>
     <body>
@@ -44,14 +45,16 @@ def generate_dashboard():
         response = requests.get(rss_url)
         soup = BeautifulSoup(response.content, features="xml")
         
-        html_content += f"<h3>{topic.upper()}</h3><ul>"
-        for item in soup.find_all('item')[:5]: # Top 5 articles
+        html_content += f"<h3>{topic}</h3><ul>"
+        items = soup.find_all('item')
+        if not items:
+            html_content += "<li>No new updates for this category today.</li>"
+        for item in items[:5]:
             html_content += f"<li><a href='{item.link.text}' target='_blank'>{item.title.text}</a></li>"
         html_content += "</ul>"
 
     html_content += "</div></body></html>"
     
-    # Save to a file
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(html_content)
 
