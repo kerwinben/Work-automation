@@ -9,14 +9,13 @@ def generate_dashboard():
     display_now = now_edt.strftime("%B %d, %Y | %I:%M %p")
     
     verticals = verticals = [
-        "AESA",
-        "passive radar",
-        "radar technology trends",
-        "passive coherent location",
-        "Counter-UAS (c-UAS) systems",
-        "SIGINT", 
-        "Electronic Warfare",
-        "Israeli Defense Tech"
+    # Grouping synonyms with OR (must be capitalized)
+    '("AESA radar" OR "Active Electronically Scanned Array")',
+    '("passive radar" OR "passive coherent location")',
+    "radar technology trends",
+    '("Counter-UAS" OR "c-UAS" OR "cUAS")',
+    '("COMINT" OR "SIGINT" OR "Electronic Warfare")',
+    "Israeli Defense Tech"
     ]
     
     output = []
