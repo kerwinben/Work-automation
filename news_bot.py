@@ -35,13 +35,9 @@ def generate_dashboard():
     
     # SAM.gov Search for Defense Electronics / Radars
     # Refined for High-Value Leads
-    sam_url = (
-        "https://api.sam.gov/prod/opportunities/v2/search?"
-        "q=(radar OR SIGINT OR AESA OR PCL)&" # The OR logic
-        "ncode=334511&"              # Your specific industry code
-        "sort=-modifiedDate&"
-        "limit=10"
-    )
+    # Use "OR" in capital letters between keywords
+    sam_query = "radar OR SIGINT OR AESA OR PCL"
+    sam_url = f"https://api.sam.gov/prod/opportunities/v2/search?q={sam_query}&sort=-modifiedDate&is_active=true"
     
     headers = {"User-Agent": "Mozilla/5.0"}
     try:
