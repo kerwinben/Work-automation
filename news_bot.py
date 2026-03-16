@@ -19,19 +19,6 @@ def generate_dashboard():
     ]
     competitors = ["Hensoldt", "Northrop Grumman", "L3Harris", "Lockheed Martin Radar", "Selentium Defense", "Hidden Level"]
     
-    # 3. STOCK TICKERS (Visual placeholders for now)
-    stocks = {"LMT": "Lockheed", "NOC": "Northrop", "LHX": "L3Harris", "ESLT": "Elbit"}
-
-    # 4. INTELLIGENCE GLOSSARY
-    glossary = {
-        "PEO IEW&S": "Program Executive Office Intelligence, Electronic Warfare and Sensors.",
-        "AESA": "Active Electronically Scanned Array - high-bandwidth, multi-target radar.",
-        "COMINT": "Communications Intelligence - intercepting foreign communications.",
-        "MASINT": "Measurement and Signature Intelligence - distinct technical data (heat, sound).",
-        "c-UAS": "Counter-Unmanned Aircraft Systems - detection and neutralization of drones."
-    }
-    acronym, definition = random.choice(list(glossary.items()))
-
     # 5. HTML START
     html_content = f"""
     <html>
