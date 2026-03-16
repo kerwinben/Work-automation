@@ -2,7 +2,7 @@ name: Deploy Intelligence Dashboard
 on:
   schedule:
     - cron: '17 12 * * *' # Runs at 8:17 AM EDT (12:17 UTC)
-  workflow_dispatch: # Manual button in Actions tab
+  workflow_dispatch: 
 
 permissions:
   contents: write
@@ -13,7 +13,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
+      - name: Checkout
         uses: actions/checkout@v6 
 
       - name: Set up Python
@@ -21,24 +21,26 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install Dependencies
-        run: |
-          pip install requests beautifulsoup4 lxml
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4 lxml
 
       - name: Run Scraper
         run: python news_bot.py
 
-      - name: Upload Static Artifact
+      - name: Upload static files
         uses: actions/upload-pages-artifact@v4
         with:
-          path: "." # Uploads the folder containing index.html
+          path: "." 
 
   deploy:
     needs: build
-    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
