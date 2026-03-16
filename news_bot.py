@@ -1,12 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 import urllib.parse
-import smtplib
-import os
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 
-def get_news():
+def generate_dashboard():
     verticals = [
         "AESA", 
         "passive radar",
@@ -17,35 +13,44 @@ def get_news():
         "Israeli Defense Tech"
     ]
     
+    # Start of the HTML file with some basic styling
+    html_content = """
+    <html>
+    <head>
+        <title>Defense Intelligence Dashboard</title>
+        <style>
+            body { font-family: sans-serif; margin: 40px; background: #f4f4f9; }
+            .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+            h1 { color: #333; border-bottom: 2px solid #0056b3; padding-bottom: 10px; }
+            h3 { color: #0056b3; margin-top: 25px; }
+            ul { list-style: none; padding: 0; }
+            li { margin-bottom: 10px; padding: 10px; border-left: 4px solid #0056b3; background: #fafafa; }
+            a { text-decoration: none; color: #333; font-weight: bold; }
+            a:hover { color: #0056b3; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Intelligence Brief: Radars, c-UAS & SIGINT</h1>
+            <p><i>Updated: 2026-03-16</i></p>
+    """
+
     for topic in verticals:
         encoded_topic = urllib.parse.quote(topic)
         rss_url = f"https://news.google.com/rss/search?q={encoded_topic}&hl=en-US&gl=US&ceid=US:en"
         response = requests.get(rss_url)
         soup = BeautifulSoup(response.content, features="xml")
         
-        report += f"<h3>{topic.upper()}</h3><ul>"
-        for item in soup.find_all('item')[:3]:
-            report += f"<li><a href='{item.link.text}'>{item.title.text}</a></li>"
-        report += "</ul>"
-    return report
+        html_content += f"<h3>{topic.upper()}</h3><ul>"
+        for item in soup.find_all('item')[:5]: # Top 5 articles
+            html_content += f"<li><a href='{item.link.text}' target='_blank'>{item.title.text}</a></li>"
+        html_content += "</ul>"
 
-def send_email(content):
-    sender_email = os.environ.get("SENDER_EMAIL")
-    receiver_email = os.environ.get("RECEIVER_EMAIL")
-    password = os.environ.get("EMAIL_PASSWORD")
-
-    msg = MIMEMultipart()
-    msg['From'] = sender_email
-    msg['To'] = receiver_email
-    msg['Subject'] = "Morning Market Intelligence Brief"
-
-    msg.attach(MIMEText(content, 'html'))
-
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-        server.login(sender_email, password)
-        server.sendmail(sender_email, receiver_email, msg.as_string())
+    html_content += "</div></body></html>"
+    
+    # Save to a file
+    with open("index.html", "w", encoding="utf-8") as f:
+        f.write(html_content)
 
 if __name__ == "__main__":
-    news_content = get_news()
-    send_email(news_content)
-    print("Email sent successfully.")
+    generate_dashboard()
