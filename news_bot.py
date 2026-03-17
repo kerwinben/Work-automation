@@ -36,20 +36,19 @@ def generate_dashboard():
     headers = {"User-Agent": "Mozilla/5.0"}
     
     for label, search_query in verticals.items():
-        # Using the clean 'label' for the UI and 'search_query' for the actual engine
         output.append(f"<h3>{label}</h3><ul>")
         
-        # URL encoding the complex boolean string
-        query = urllib.parse.quote(f'{search_query} when:1d')
+        # CHANGE: 'when:36h' ensures stories stay on the dashboard for 1.5 days
+        query = urllib.parse.quote(f'{search_query} when:36h')
         rss_url = f"https://news.google.com/rss/search?q={query}&hl=en-US&gl=US&ceid=US:en"
         
         try:
             res = requests.get(rss_url, headers=headers, timeout=10)
             soup = BeautifulSoup(res.content, "xml")
-            items = soup.find_all('item')[:4]
+            items = soup.find_all('item')[:5] # Increased to 5 items to fill the extra time
             
             if not items:
-                output.append("<li>No new updates in the last 24 hours.</li>")
+                output.append("<li>No new updates in the last 36 hours.</li>")
             else:
                 for item in items:
                     output.append(f"<li><a href='{item.link.text}' target='_blank'>{item.title.text}</a></li>")
