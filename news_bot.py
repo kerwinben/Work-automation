@@ -12,7 +12,7 @@ def generate_dashboard():
     # Refined verticals with clean labels and targeted search strings
     verticals = {
         "Advanced Radar Systems": '("AESA radar" OR "Active Electronically Scanned Array")',
-        "Passive Detection": '("passive radar" OR "passive coherent location" OR "PCL")',
+        "Passive Detection": '("passive radar" OR "passive coherent location")',
         "Radar Market Trends": "radar technology trends",
         "Counter-UAS Operations": '("Counter-UAS" OR "c-UAS" OR "cUAS")',
         "SIGINT & Electronic Warfare": '("COMINT" OR "SIGINT" OR "Signals Intelligence" OR "Electronic Warfare")',
