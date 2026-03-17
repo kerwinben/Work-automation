@@ -16,7 +16,7 @@ def generate_dashboard():
         "Radar Market Trends": "radar technology trends",
         "Counter-UAS Operations": '("Counter-UAS" OR "c-UAS" OR "cUAS")',
         "SIGINT & Electronic Warfare": '("COMINT" OR "SIGINT" OR "Signals Intelligence" OR "Electronic Warfare")',
-        "Regional Tech Intelligence": "Israeli Defense Tech"
+        "Regional Tech Intelligence": '("Israeli Defense Tech" OR "American Defense Tech" OR "Chinese Defense Tech" OR "Russian Defense Tech")'
     }
     
     output = []
