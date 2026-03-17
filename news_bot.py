@@ -32,6 +32,12 @@ def generate_dashboard():
     output.append(f"<body><div class='container'><h1>Director's Intelligence Hub</h1>")
     output.append(f"<{display_now} EDT</p>")
 
+    # --- RESTORED TIMESTAMP BLOCK ---
+    output.append(f"<div class='timestamp-box'>")
+    output.append(f"<span>🕒 {display_now} EDT</span>")
+    output.append(f"<span>{run_label}</span>")
+    output.append("</div>")
+    
     # --- INDUSTRY NEWS SECTION ---
     headers = {"User-Agent": "Mozilla/5.0"}
     
