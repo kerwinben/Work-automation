@@ -5,69 +5,56 @@ from datetime import datetime, timedelta, timezone
 
 def generate_dashboard():
     now_utc = datetime.now(timezone.utc)
+    # Adjusting for EDT (UTC-4)
     now_edt = now_utc - timedelta(hours=4)
     display_now = now_edt.strftime("%B %d, %Y | %I:%M %p")
     
-    verticals = verticals = [
-    # Grouping synonyms with OR (must be capitalized)
-    '("AESA radar" OR "Active Electronically Scanned Array")',
-    '("passive radar" OR "passive coherent location")',
-    "radar technology trends",
-    '("Counter-UAS" OR "c-UAS" OR "cUAS")',
-    '("COMINT" OR "SIGINT" OR "Electronic Warfare")',
-    "Israeli Defense Tech"
-    ]
+    # Refined verticals with clean labels and targeted search strings
+    verticals = {
+        "Advanced Radar Systems": '("AESA radar" OR "Active Electronically Scanned Array")',
+        "Passive Detection": '("passive radar" OR "passive coherent location" OR "PCL")',
+        "Radar Market Trends": "radar technology trends",
+        "Counter-UAS Operations": '("Counter-UAS" OR "c-UAS" OR "cUAS")',
+        "SIGINT & Electronic Warfare": '("COMINT" OR "SIGINT" OR "Signals Intelligence" OR "Electronic Warfare")',
+        "Regional Tech Intelligence": "Israeli Defense Tech"
+    }
     
     output = []
     output.append("<html><head><title>Strategic Hub</title>")
     output.append("<style>body { font-family: 'Segoe UI', sans-serif; margin: 40px; background: #f0f2f5; }")
-    output.append(".container { max-width: 950px; margin: auto; background: white; padding: 30px; border-radius: 12px; }")
-    output.append(".sam-box { background: #e3f2fd; padding: 20px; border-radius: 8px; border-left: 6px solid #1565c0; margin-bottom: 30px; }")
-    output.append("h1 { color: #1a237e; border-bottom: 4px solid #1a237e; }")
-    output.append("h3 { color: #c62828; margin-top: 25px; border-bottom: 1px solid #ddd; }")
-    output.append("li { margin-bottom: 12px; padding: 10px; background: #fafafa; list-style: none; border-bottom: 1px solid #eee; }")
-    output.append("a { text-decoration: none; color: #0277bd; font-weight: bold; }</style></head>")
+    output.append(".container { max-width: 950px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }")
+    output.append("h1 { color: #1a237e; border-bottom: 4px solid #1a237e; padding-bottom: 10px; }")
+    output.append("h3 { color: #1565c0; margin-top: 35px; border-bottom: 2px solid #eee; padding-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }")
+    output.append("li { margin-bottom: 12px; padding: 12px; background: #fafafa; list-style: none; border-left: 4px solid #1a237e; transition: 0.3s; }")
+    output.append("li:hover { background: #f1f8e9; transform: translateX(5px); }")
+    output.append("a { text-decoration: none; color: #0277bd; font-weight: bold; font-size: 1.1em; }</style></head>")
+    
     output.append(f"<body><div class='container'><h1>Director's Intelligence Hub</h1>")
-    output.append(f"<p><strong>Last Updated:</strong> {display_now} EDT</p>")
+    output.append(f"<{display_now} EDT</p>")
 
-    # --- SECTION 1: SAM.GOV OPPORTUNITIES ---
-    output.append("<div class='sam-box'><h2>🎯 Active Gov Opportunities (SAM.gov)</h2><ul>")
-    
-    # SAM.gov Search for Defense Electronics / Radars
-    # Refined for High-Value Leads
-    # Use "OR" in capital letters between keywords
-    sam_query = "radar OR SIGINT OR AESA OR PCL"
-    sam_url = f"https://sam.gov/api/prod/opportunities/v1/search?index=opp&q={sam_query}&sort=-modifiedDate&mode=search&is_active=true"
-    
+    # --- INDUSTRY NEWS SECTION ---
     headers = {"User-Agent": "Mozilla/5.0"}
-    try:
-        # Note: In a production environment, use a SAM.gov API Key for more than 10 hits
-        sam_res = requests.get(sam_url, headers=headers, timeout=15)
-        opportunities = sam_res.json().get('opportunitiesData', [])[:5]
+    
+    for label, search_query in verticals.items():
+        # Using the clean 'label' for the UI and 'search_query' for the actual engine
+        output.append(f"<h3>{label}</h3><ul>")
         
-        if not opportunities:
-            output.append("<li>No new SAM.gov notices in the last 24h.</li>")
-        for opp in opportunities:
-            title = opp.get('title', 'No Title')
-            sol_num = opp.get('solicitationNumber', 'N/A')
-            link = f"https://sam.gov/opp/{opp.get('noticeId')}/view"
-            output.append(f"<li><strong>[{sol_num}]</strong> <a href='{link}' target='_blank'>{title}</a></li>")
-    except:
-        output.append("<li>SAM.gov feed temporarily unavailable.</li>")
-    output.append("</ul></div>")
-
-    # --- SECTION 2: INDUSTRY NEWS ---
-    for topic in verticals:
-        output.append(f"<h3>{topic.upper()} NEWS</h3><ul>")
-        query = urllib.parse.quote(f'"{topic}" when:1d')
+        # URL encoding the complex boolean string
+        query = urllib.parse.quote(f'{search_query} when:1d')
         rss_url = f"https://news.google.com/rss/search?q={query}&hl=en-US&gl=US&ceid=US:en"
+        
         try:
             res = requests.get(rss_url, headers=headers, timeout=10)
             soup = BeautifulSoup(res.content, "xml")
-            for item in soup.find_all('item')[:4]:
-                output.append(f"<li><a href='{item.link.text}' target='_blank'>{item.title.text}</a></li>")
-        except:
-            output.append("<li>Feed delay. Check back later.</li>")
+            items = soup.find_all('item')[:4]
+            
+            if not items:
+                output.append("<li>No new updates in the last 24 hours.</li>")
+            else:
+                for item in items:
+                    output.append(f"<li><a href='{item.link.text}' target='_blank'>{item.title.text}</a></li>")
+        except Exception as e:
+            output.append(f"<li>Feed delay. Error: {str(e)}</li>")
         output.append("</ul>")
 
     output.append("</div></body></html>")
