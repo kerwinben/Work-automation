@@ -63,10 +63,28 @@ def generate_dashboard():
                 output.append("<li>No new updates in the last 48 hours.</li>")
             else:
                 for item in items:
+                    # More robust link extraction for Google News RSS
                     title_tag = item.find('title')
+                    # Google News RSS often puts the actual URL in a 'link' tag 
+                    # but html.parser can be finicky with it.
                     link_tag = item.find('link')
+                    
                     if title_tag and link_tag:
-                        output.append(f"<li><a href='{link_tag.get_text()}' target='_blank'>{title_tag.get_text()}</a></li>")
+                        title_text = title_tag.get_text()
+                        # Get the raw text and strip any whitespace/newlines
+                        url = link_tag.get_text().strip()
+                        
+                        # Guardrail: Ensure it's not linking back to itself
+                        if url.startswith("http"):
+                            output.append(f"<li><a href='{url}' target='_blank' rel='noopener noreferrer'>{title_text}</a></li>")
+                        else:
+                            # Fallback if the parser missed the text inside the tag
+                            try:
+                                url = item.link.next_sibling.strip()
+                                if url.startswith("http"):
+                                    output.append(f"<li><a href='{url}' target='_blank' rel='noopener noreferrer'>{title_text}</a></li>")
+                            except:
+                                continue
             output.append("</ul>")
 
         output.append("</div></body></html>")
