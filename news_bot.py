@@ -20,7 +20,7 @@ def generate_dashboard():
         verticals = {
             "Advanced Radar Systems": '("AESA radar" OR "Active Electronically Scanned Array")',
             "Passive Detection": '("passive radar" OR "passive coherent location")',
-            "Radar Market Trends": "radar technology trends",
+            "Radar Market Trends": "Military radar technology trends",
             "Counter-UAS Operations": '("Counter-UAS" OR "c-UAS" OR "cUAS")',
             "SIGINT & Electronic Warfare": '("COMINT" OR "SIGINT" OR "Signals Intelligence" OR "Electronic Warfare")',
             "Regional Tech Intelligence": '("Israeli Defense Tech" OR "American Defense Tech" OR "Chinese Defense Tech" OR "Russian Defense Tech")'
