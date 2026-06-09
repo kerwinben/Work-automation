@@ -1,8 +1,3 @@
-
-    
-    # Refined verticals with clean labels and targeted search strings
-    
-    
 import requests
 from bs4 import BeautifulSoup
 import urllib.parse
@@ -17,16 +12,17 @@ def generate_dashboard():
         display_now = now_edt.strftime("%B %d, %Y | %I:%M %p")
         run_label = "Morning Update" if now_edt.hour < 12 else "Afternoon Update"
 
+        # Global Exclusions to aggressively eliminate hobbyist/toy drone clutter
+        exclusions = " -dji -toy -hobby -racing -consumer -amateur -review"
+
+        # 2. Corrected Multi-line Technical Strings
         verticals = {
-            "Advanced Radar Systems": '("AESA" OR "Active Electronically Scanned Array" OR "GaN radar" OR "digital beamforming") 
-            AND ("X-band" OR "S-band" OR "Ku-band" OR "multi-mission" OR "low-RCS")',
-            "Passive Detection": '("passive radar" OR "passive coherent location")',
-            "Radar Market Trends": "Military radar technology trends",
-            "Counter-UAS Operations": '("c-UAS" OR "Counter-UAS" OR "counter-drone" OR "swarming") 
-            AND ("GNSS-denied" OR "GPS-jammed" OR "soft-kill" OR "hard-kill" OR "directed energy" OR "threat emulation" OR "Red Air")',
-            "SIGINT & Electronic Warfare": '("SIGINT" OR "COMINT" OR "ELINT" OR "spectrum intelligence") 
-            AND ("RF geolocation" OR "direction finding" OR "airborne ISR" OR "CMS integration" OR "tactical data link")',
-            "Regional Tech Intelligence": '("Israeli Defense Tech" OR "American Defense Tech" OR "Chinese Defense Tech" OR "Russian Defense Tech")'
+            "Advanced Radar Systems": """("AESA" OR "Active Electronically Scanned Array" OR "GaN radar" OR "digital beamforming") AND ("X-band" OR "S-band" OR "Ku-band" OR "multi-mission" OR "low-RCS")""",
+            "Passive Detection": """("passive radar" OR "passive coherent location")""",
+            "Radar Market Trends": f"Military radar technology trends{exclusions}",
+            "Counter-UAS Operations": f"""("c-UAS" OR "Counter-UAS" OR "counter-drone" OR "swarming") AND ("GNSS-denied" OR "GPS-jammed" OR "soft-kill" OR "hard-kill" OR "directed energy" OR "threat emulation" OR "Red Air"){exclusions}""",
+            "SIGINT & Electronic Warfare": """("SIGINT" OR "COMINT" OR "ELINT" OR "spectrum intelligence") AND ("RF geolocation" OR "direction finding" OR "airborne ISR" OR "CMS integration" OR "tactical data link")""",
+            "Regional Tech Intelligence": """("Israeli Defense Tech" OR "American Defense Tech" OR "Chinese Defense Tech" OR "Russian Defense Tech")"""
         }
         
         # 3. HTML Construction
@@ -43,57 +39,45 @@ def generate_dashboard():
             f"<div class='timestamp-box'><span>🕒 {display_now} EDT</span><span>{run_label}</span></div>"
         ]
 
-        # Using a more standard browser header to avoid being blocked
         headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
         
         for label, search_query in verticals.items():
             output.append(f"<h3>{label}</h3><ul>")
             
-            # Using 'when:2d' is often more stable than '36h' in the Google RSS API
-            query = urllib.parse.quote(f'{search_query} when:2d')
+            query = urllib.parse.quote(f'{search_query.strip()} when:2d')
             rss_url = f"https://news.google.com/rss/search?q={query}&hl=en-US&gl=US&ceid=US:en"
             
             res = requests.get(rss_url, headers=headers, timeout=15)
             
             if res.status_code != 200:
-                output.append(f"<li>Search temporary unavailable (Status: {res.status_code})</li>")
+                output.append(f"<li>Search temporarily unavailable (Status: {res.status_code})</li>")
                 continue
 
-            soup = BeautifulSoup(res.content, "html.parser")
+            # Switch to 'xml' to perfectly handle RSS structural tags like <link>
+            soup = BeautifulSoup(res.content, "xml")
             items = soup.find_all('item')[:5]
             
             if not items:
                 output.append("<li>No new updates in the last 48 hours.</li>")
             else:
                 for item in items:
-                    # More robust link extraction for Google News RSS
                     title_tag = item.find('title')
-                    # Google News RSS often puts the actual URL in a 'link' tag 
-                    # but html.parser can be finicky with it.
                     link_tag = item.find('link')
                     
                     if title_tag and link_tag:
                         title_text = title_tag.get_text()
-                        # Get the raw text and strip any whitespace/newlines
                         url = link_tag.get_text().strip()
                         
-                        # Guardrail: Ensure it's not linking back to itself
                         if url.startswith("http"):
                             output.append(f"<li><a href='{url}' target='_blank' rel='noopener noreferrer'>{title_text}</a></li>")
-                        else:
-                            # Fallback if the parser missed the text inside the tag
-                            try:
-                                url = item.link.next_sibling.strip()
-                                if url.startswith("http"):
-                                    output.append(f"<li><a href='{url}' target='_blank' rel='noopener noreferrer'>{title_text}</a></li>")
-                            except:
-                                continue
+            
             output.append("</ul>")
 
         output.append("</div></body></html>")
         
         with open("index.html", "w", encoding="utf-8") as f:
             f.write("".join(output))
+        print("SUCCESS: Dashboard written to index.html")
 
     except Exception as e:
         print(f"FAILED: {str(e)}")
