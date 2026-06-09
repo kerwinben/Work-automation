@@ -18,11 +18,14 @@ def generate_dashboard():
         run_label = "Morning Update" if now_edt.hour < 12 else "Afternoon Update"
 
         verticals = {
-            "Advanced Radar Systems": '("AESA radar" OR "Active Electronically Scanned Array")',
+            "Advanced Radar Systems": '("AESA" OR "Active Electronically Scanned Array" OR "GaN radar" OR "digital beamforming") 
+            AND ("X-band" OR "S-band" OR "Ku-band" OR "multi-mission" OR "low-RCS")',
             "Passive Detection": '("passive radar" OR "passive coherent location")',
             "Radar Market Trends": "Military radar technology trends",
-            "Counter-UAS Operations": '("Counter-UAS" OR "c-UAS" OR "cUAS")',
-            "SIGINT & Electronic Warfare": '("COMINT" OR "SIGINT" OR "Signals Intelligence" OR "Electronic Warfare")',
+            "Counter-UAS Operations": '("c-UAS" OR "Counter-UAS" OR "counter-drone" OR "swarming") 
+            AND ("GNSS-denied" OR "GPS-jammed" OR "soft-kill" OR "hard-kill" OR "directed energy" OR "threat emulation" OR "Red Air")',
+            "SIGINT & Electronic Warfare": '("SIGINT" OR "COMINT" OR "ELINT" OR "spectrum intelligence") 
+            AND ("RF geolocation" OR "direction finding" OR "airborne ISR" OR "CMS integration" OR "tactical data link")',
             "Regional Tech Intelligence": '("Israeli Defense Tech" OR "American Defense Tech" OR "Chinese Defense Tech" OR "Russian Defense Tech")'
         }
         
