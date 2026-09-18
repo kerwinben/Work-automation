@@ -13,7 +13,7 @@ def generate_dashboard():
     try:
         # 1. Time Setup
         now_utc = datetime.now(timezone.utc)
-        now_edt = now_utc - timedelta(hours=4) 
+        now_edt = now_utc - timedelta(hours=5) 
         display_now = now_edt.strftime("%B %d, %Y | %I:%M %p")
         run_label = "Morning Update" if now_edt.hour < 12 else "Afternoon Update"
 
