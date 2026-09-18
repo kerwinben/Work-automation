@@ -22,7 +22,7 @@ def generate_dashboard():
             "Passive Detection": '("passive radar" OR "passive coherent location")',
             "Radar Market Trends": "Military radar technology trends",
             "Counter-UAS Operations": '("Counter-UAS" OR "c-UAS" OR "cUAS")',
-            "SIGINT & Electronic Warfare": '("COMINT" OR "SIGINT" OR "Signals Intelligence" OR "Electronic Warfare")',
+            "SIGINT & Electronic Warfare": '("COMINT" OR "SIGINT" OR "ELINT" OR "Signals Intelligence" OR "Electronic Warfare" OR "Electronic Intelligence")',
             "Regional Tech Intelligence": '("Israeli Defense Tech" OR "American Defense Tech" OR "Chinese Defense Tech" OR "Russian Defense Tech")'
         }
         
