@@ -1,10 +1,10 @@
 name: Deploy Intelligence Dashboard
 on:
   schedule:
-    # Runs at 10:30 UTC (6:30 AM EDT)
-    - cron: '30 10 * * *'
-    # Runs at 17:00 UTC (1:00 PM EDT)
-    - cron: '00 17 * * *'
+    # Runs at 11:30 UTC (6:30 AM EDT)
+    - cron: '30 11 * * *'
+    # Runs at 16:00 UTC (1:00 PM EDT)
+    - cron: '00 16 * * *'
   workflow_dispatch:
 
 permissions:
